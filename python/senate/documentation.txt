@@ -1,0 +1,87 @@
+Time varying text based ideal points
+
+- Sourav Adhikari, Bettina Gruen, Paul Hofmarcher
+
+===Documentation===
+
+Outlining the steps needed to reproduce the results. 
+
+Dataset: HeinOnline Data "hein-daily.zip" at https://data.stanford.edu/congress_text#download-data (to be unzipped)
+Data available for Sessions 97-114
+
+Stopwords: Available at https://github.com/keyonvafa/tbip/blob/master/setup/stopwords/senate_speeches.txt (to be saved appropriately and path needs to be mentioned in 01_preprocessing_complete_vocabulary.ipynb and 02_preprocessing_input_matrices.ipynb accordingly)
+
+
+## Paul: I ran both files local in svn/baR/Projects/CongressSpeeches. The "modified" files are stored there.
+* 01_preprocessing_complete_vocabulary.ipynb
+
+Use the ipynb notebook on a computing cluster as the RAM requirement is high. Running the notebook creates a single vocablary file called vocabulary.txt saved to the folder ~/data. 
+
+* 02_preprocessing_input_matrices.ipynb
+
+The vocabulary file generated can then be used to create input matrices needed for Time varying TBIP. All the input matrices will be stored to the folder ~/data/<session>/input where session name ranges from 97 to 114.
+
+The following files are saved:
+
+1. counts.npz
+2. author_indices.npy
+3. author_map.txt
+4. vocabulary.txt 
+
+Folder ~/data can either be used directly on the local machine if there is GPU support or uploaded to Google drive for usage in Google Colab Pro. 
+
+* 03_sess_97.ipynb
+
+To be either run on local machine if Tensorflow 1.15 GPU is available, else to be run on Google colab/colab pro.
+
+Update (October 2022) : Google colab has ended support for Tensorflow 1.x. Hence the "magic line" %tensorflow_version 1.x may not work anymore. 
+Tensorflow 1.15 has to be installed manually within the Colab environment in order to run the code as it is by following the given steps before start of execution:
+
+!pip uninstall tensorflow
+!pip install tensorflow-gpu==1.15
+!apt install --allow-change-held-packages libcudnn7=7.4.1.5-1+cuda10.0 
+
+Default TBIP inference for session 97 to initialize the time varying TBIP for subsequent sessions. The following files are saved to ~/data/97/output:
+
+1. document_topic_mean.npy
+2. negative_topic_mean.npy
+3. neutral_topic_mean.npy
+4. positive_topic_mean.npy
+5. ideological_topic_loc.npy
+6. ideological_topic_scale.npy
+7. objective_topic_loc.npy
+8. objective_topic_scale.npy
+9. ideal_point_mean.npy
+
+* 03_variational_inference_theta_beta_eta.ipynb
+
+To be either run on local machine if Tensorflow 1.15 GPU is available, else to be run on Google colab pro. 
+
+Time varying TBIP from session 98 onwards. Saves the same files as above to ~/data/<session>/output for session 98 onwards.
+
+* 04_plots.ipynb
+
+Creates and stores all required plots to ~/data/figures
+
+The following plots are created:
+
+1. Ideal points for democrats and republicans across the sessions 
+2. Topic distribution of Republicans and democrats (thetas) across sessions
+3. Average partisanship over the sessions (absolute difference between mean ideal points of Republicans and democrats)
+4. Topic propagation (positive, neutral and negative), shown as cosine similarities heatmap
+5. wordclouds for sessions/topics as needed 
+
+
+* 06_list_top_bigrams.ipynb
+
+Creates top bigrams associated with each topic for each session and stores them as .csv files with the format:
+
+|session | topic | bigram | weight |
+
+and saves to ~/data/
+
+The following files are created:
+
+1. neutral_10_bigrams.csv
+2. negative_10_bigrams.csv
+3. positve_10_bigrams.csv
